@@ -1,10 +1,8 @@
-import AWS from "aws-sdk";
 import uuid from "uuid";
 import { success, failure } from "./libs/response";
+import { dynamoCall } from "./libs/dynamodb-lib";
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
-
-export function main(event, context, callback) {
+export async function main(event, context, callback) {
     const data = JSON.parse(event.body);
 
     const params = {
@@ -18,12 +16,10 @@ export function main(event, context, callback) {
         }
     };
 
-    dynamoDb.put(params, (error, data) => {
-        if (error) {
-            callback(null, failure({ status: false }));
-            return;
-        }
-
-        callback(null, success(params.Item));
-    });
+    try {
+        await dynamoCall("put", params);
+        return success(params.Item);
+    } catch (error) {
+        return failure({ status: false });
+    }
 }
