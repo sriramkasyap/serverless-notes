@@ -12,7 +12,8 @@ export async function main(event, context, callback) {
         await stripe.charges.create({
             source,
             amount,
-            description
+            description,
+            currency: "inr"
         });
         return success({ status: true });
     } catch (error) {
